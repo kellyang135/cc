@@ -1,6 +1,9 @@
 # neuroguide/backend/app/services/datasets.py
+import asyncio
 from pathlib import Path
 from dataclasses import dataclass
+
+import mne
 
 
 @dataclass
@@ -75,3 +78,47 @@ class DatasetService:
         """Check if dataset is already downloaded."""
         dataset_path = self.data_dir / dataset_id
         return dataset_path.exists() and any(dataset_path.iterdir())
+
+    async def load_dataset(
+        self,
+        dataset_id: str,
+        subject: int = 1,
+        run: int = 1
+    ) -> mne.io.Raw:
+        """Load a dataset and return MNE Raw object."""
+        if dataset_id == "sample_eyes":
+            return await self._load_sample_eyes(subject, run)
+        elif dataset_id == "eeg_motor_imagery":
+            return await self._load_motor_imagery(subject, run)
+        else:
+            raise ValueError(f"Unknown dataset: {dataset_id}")
+
+    async def _load_sample_eyes(self, subject: int, run: int) -> mne.io.Raw:
+        """Load eyes open/closed sample using MNE's eegbci dataset."""
+        def _load():
+            raw_fnames = mne.datasets.eegbci.load_data(subject, runs=[run], update_path=True)
+            raw = mne.io.read_raw_edf(raw_fnames[0], preload=True)
+            mne.datasets.eegbci.standardize(raw)
+            return raw
+
+        return await asyncio.to_thread(_load)
+
+    async def _load_motor_imagery(self, subject: int, run: int) -> mne.io.Raw:
+        """Load motor imagery dataset from PhysioNet."""
+        def _load():
+            imagery_runs = [4, 8, 12]
+            run_idx = min(run - 1, len(imagery_runs) - 1)
+            raw_fnames = mne.datasets.eegbci.load_data(subject, runs=[imagery_runs[run_idx]], update_path=True)
+            raw = mne.io.read_raw_edf(raw_fnames[0], preload=True)
+            mne.datasets.eegbci.standardize(raw)
+            return raw
+
+        return await asyncio.to_thread(_load)
+
+    def get_channel_names(self, raw: mne.io.Raw) -> list[str]:
+        """Get list of channel names from Raw object."""
+        return raw.info['ch_names']
+
+    def get_sample_rate(self, raw: mne.io.Raw) -> float:
+        """Get sampling frequency from Raw object."""
+        return raw.info['sfreq']
