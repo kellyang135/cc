@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers import chat
+
 app = FastAPI(
     title="NeuroGuide",
     description="EEG exploration assistant with AI-narrated tours",
@@ -14,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat.router)
 
 
 @app.get("/health")
