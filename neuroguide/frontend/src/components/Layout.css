@@ -1,0 +1,67 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.viz-panel {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+  background: white;
+  border-right: 1px solid #e9ecef;
+}
+
+.chat-panel {
+  width: 400px;
+  min-width: 350px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+@media (max-width: 900px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .viz-panel {
+    flex: none;
+    height: 50%;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .chat-panel {
+    width: 100%;
+    max-width: none;
+    flex: 1;
+  }
+}
