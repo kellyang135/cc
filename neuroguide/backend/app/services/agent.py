@@ -137,9 +137,14 @@ class NeuroGuideAgent:
                     "content": assistant_message.get("content", ""),
                     "tool_calls": assistant_message.get("tool_calls"),
                 })
+                # Only include message in tool response, not full data
+                tool_response = {
+                    "success": result.get("success", True),
+                    "message": result.get("message", ""),
+                }
                 self.conversation_history.append({
                     "role": "tool",
-                    "content": json.dumps(result),
+                    "content": json.dumps(tool_response),
                 })
 
             # Get next response from LLM
